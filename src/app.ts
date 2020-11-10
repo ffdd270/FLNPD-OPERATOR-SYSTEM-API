@@ -13,9 +13,28 @@ app.use( express.static( path.join(__dirname, 'public' )));
 
 // 여기서부터 라우터
 
-import { indexRouter } from './routes';
+import { indexRouter } from './routes/index';
+import { characterRouter } from './routes/character';
 
 app.use( "/", indexRouter );
+app.use( "/character", characterRouter );
 
+
+// 데베
+import {Database} from "./db/database";
+
+import {CharacterDocuments} from "./db/documents/character";
+import {ChannelDocuments} from "./db/documents/channel";
+import {ItemDocuments} from "./db/documents/item";
+import {InventoryDocuments} from "./db/documents/inventory";
+
+let load_db = async ()=>
+{
+    await Database.ClearDatabase();
+    await Database.AddModels([CharacterDocuments, ChannelDocuments, ItemDocuments, InventoryDocuments]);
+    console.log("READY.");
+}
+
+load_db().then(r => { Database.AfterLoad(); });
 
 module.exports = app;
