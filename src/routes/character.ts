@@ -1,7 +1,20 @@
-import express from 'express';
+import express, {Request} from 'express';
 import { CharacterDocuments } from "../db/documents/character";
-
 export let characterRouter = express.Router();
+
+async function get_character( req : Request ) : Promise<CharacterDocuments>
+{
+    if (  req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
+
+    let room_id : string = req.body.room_id;
+    let id : string = req.body.id;
+
+    let result  = await CharacterDocuments.findOne( { where: { id: id, room_id: room_id } })
+
+    if ( result == null ) { throw "Not Found"; }
+    return result;
+}
+
 
 
 characterRouter.post( '/create', function( req , res, next )
@@ -9,24 +22,28 @@ characterRouter.post( '/create', function( req , res, next )
     res.send("character add");
 });
 
-characterRouter.get( '/get', async function( req , res, next )
+characterRouter.get( '/get', async function( req : Request, res, next )
 {
-    let room_id : string = req.body.room_id;
-    let id : string = req.body.id;
-
-    let result  = await CharacterDocuments.findOne( { where: { id: id, room_id: room_id } })
-    if( result == null )
+    try
     {
-        res.send("Not Found.");
-        return;
+        res.send( await get_character( req ) );
     }
-
-    res.send(result);
+    catch (e)
+    {
+        res.send(e);
+    }
 });
 
-characterRouter.post( '/update', function( req , res, next )
+characterRouter.post( '/update', async function( req , res, next )
 {
-    res.send("character update");
+    try
+    {
+        res.send( await get_character( req ) );
+    }
+    catch (e)
+    {
+        res.send(e);
+    }
 });
 
 
