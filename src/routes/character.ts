@@ -83,8 +83,17 @@ characterRouter.post( '/update', async function( req , res, next )
 });
 
 
-characterRouter.post( '/delete', function( req , res, next )
+characterRouter.post( '/delete', async function( req , res, next )
 {
-    res.send("character delete");
+    try
+    {
+        let character =  await get_character( req );
+        await character.destroy();
+        res.send("character delete");
+    }
+    catch (e)
+    {
+        res.send(e);
+    }
 });
 
