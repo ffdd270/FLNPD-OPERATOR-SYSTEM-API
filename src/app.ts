@@ -15,9 +15,11 @@ app.use( express.static( path.join(__dirname, 'public' )));
 
 import { indexRouter } from './routes/index';
 import { characterRouter } from './routes/character';
+import { itemRouter } from './routes/item';
 
 app.use( "/", indexRouter );
 app.use( "/character", characterRouter );
+app.use( "/item", itemRouter );
 
 
 // 데베

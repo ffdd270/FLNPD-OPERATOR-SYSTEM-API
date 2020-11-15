@@ -37,3 +37,10 @@ export async function find_document<DocumentType>( document : FindDocumentInterf
 
     return await document.findOne( { where: { id: id, room_id: room_id } }) !== null;
 }
+
+
+export function check_id_params( req : Request ) : boolean
+{
+    if ( req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
+    return true;
+}
