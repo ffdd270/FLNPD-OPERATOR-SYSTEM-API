@@ -1,5 +1,6 @@
 import express, {Request} from 'express';
 import { CharacterDocuments } from "../db/documents/character";
+import {update_attr} from "./item";
 
 export let characterRouter = express.Router();
 
@@ -48,18 +49,6 @@ type CharacterParams =
     sp_max? : number;
     sp? : number;
 }
-
-
-function update_attr<Type, Key extends keyof Type>( dest_data : Type, data : Type, key : Key[] )
-{
-    key.map( (key) => {
-        if ( data[key] !== undefined )
-        {
-            dest_data[key] = data[key];
-        }
-    } )
-}
-
 
 function make_character_params_from_req( req : Request ) : CharacterParams
 {
