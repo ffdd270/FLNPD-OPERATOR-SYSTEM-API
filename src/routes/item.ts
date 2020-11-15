@@ -83,3 +83,20 @@ itemRouter.get( '/get', async function( req, res, next )
         res.send(e);
     }
 });
+
+itemRouter.post( '/delete',  async function( req, res, next )
+{
+    try
+    {
+        let item =  await get_document( ItemDocuments, req ) as ItemDocuments;
+        await item.destroy();
+
+        res.statusCode = 200;
+        res.send("item delete");
+    }
+    catch (e)
+    {
+        res.statusCode = 422;
+        res.send(e);
+    }
+});
