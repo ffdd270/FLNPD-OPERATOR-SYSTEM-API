@@ -1,32 +1,8 @@
 import express, {Request} from 'express';
 import { CharacterDocuments } from "../db/documents/character";
-import {update_attr} from "../common/util";
+import {find_document, get_document, update_attr} from "../common/util";
 
 export let characterRouter = express.Router();
-
-
-async function get_character( req : Request ) : Promise<CharacterDocuments>
-{
-    if ( req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
-
-    let room_id : string = req.body.room_id;
-    let id : string = req.body.id;
-
-    let result  = await CharacterDocuments.findOne( { where: { id: id, room_id: room_id } })
-
-    if ( result == null ) { throw "Not Found"; }
-    return result;
-}
-
-async function find_character( req : Request ) : Promise<boolean>
-{
-    if ( req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
-
-    let room_id : string = req.body.room_id;
-    let id : string = req.body.id;
-
-    return await CharacterDocuments.findOne( { where: { id: id, room_id: room_id } }) !== null;
-}
 
 type CharacterCreateParams =
 {
@@ -62,7 +38,7 @@ characterRouter.post( '/create',  async function( req , res, next )
 {
     try
     {
-        if ( await find_character(req) )
+        if ( await find_document( CharacterDocuments, req ) )
         {
             throw  "ALREADY CHARACTER HERE.";
         }
@@ -85,7 +61,7 @@ characterRouter.get( '/get', async function( req : Request, res, next )
 {
     try
     {
-        res.send( await get_character( req ) );
+        res.send( await get_document(CharacterDocuments, req) );
     }
     catch (e)
     {
@@ -98,7 +74,7 @@ characterRouter.post( '/update', async function( req , res, next )
 {
     try
     {
-        let character =  await get_character( req );
+        let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
         let param = make_character_params_from_req( req );
 
         update_attr( character, param, [ 'name', 'comment', 'hp_max', 'hp', 'sp_max', 'sp' ] );
@@ -118,7 +94,7 @@ characterRouter.post( '/delete', async function( req , res, next )
 {
     try
     {
-        let character =  await get_character( req );
+        let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
         await character.destroy();
 
         res.statusCode = 200;
