@@ -1,6 +1,6 @@
 import express, {Request} from 'express';
 import { CharacterDocuments } from "../db/documents/character";
-import {update_attr} from "./item";
+import {update_attr} from "../common/util";
 
 export let characterRouter = express.Router();
 
