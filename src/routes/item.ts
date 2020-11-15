@@ -70,3 +70,16 @@ itemRouter.post( '/update', async function( req, res, next )
     }
 });
 
+
+itemRouter.get( '/get', async function( req, res, next )
+{
+    try
+    {
+        res.send( await get_document( ItemDocuments, req ) );
+    }
+    catch (e)
+    {
+        res.statusCode = 422;
+        res.send(e);
+    }
+});
