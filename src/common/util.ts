@@ -19,10 +19,13 @@ export async function get_document<DocumentType>( document : FindDocumentInterfa
 {
     if ( req.body[primary_key1] === undefined || req.body[primary_key2] === undefined ) { throw "Invalid Params."; }
 
-    let room_id : string = req.body.room_id;
-    let id : string = req.body.id;
+    let pk_value1 : string = req.body[primary_key1];
+    let pk_value2 : string = req.body[primary_key2];
 
-    let result  = await document.findOne( { where: { id: id, room_id: room_id } })
+    let result  = await document.findOne( { where: {
+        [primary_key1]: pk_value1,
+        [primary_key2]: pk_value2
+    } } )
 
     if ( result == null ) { throw "Not Found"; }
     return result;
@@ -32,10 +35,13 @@ export async function find_document<DocumentType>( document : FindDocumentInterf
 {
     if ( req.body[primary_key1] === undefined || req.body[primary_key2] === undefined ) { throw "Invalid Params."; }
 
-    let room_id : string = req.body.room_id;
-    let id : string = req.body.id;
+    let pk_value1 : string = req.body[primary_key1];
+    let pk_value2 : string = req.body[primary_key2];
 
-    return await document.findOne( { where: { id: id, room_id: room_id } }) !== null;
+    return await document.findOne( { where: {
+            [primary_key1]: pk_value1,
+            [primary_key2]: pk_value2
+        } }) !== null;
 }
 
 
@@ -65,6 +71,7 @@ export async function onRequest( req : Request, res : Response, func_map : Funct
     try
     {
         await func_map[req_name]( req, res );
+        res.statusCode = 200;
     }
     catch (e)
     {

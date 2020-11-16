@@ -23,7 +23,7 @@ async function onCreate( req : Request, res : Response )
 
 async function onRead( req : Request, res : Response )
 {
-    res.send( await get_document( ChannelDocuments, req ) );
+    res.send( await get_document( ChannelDocuments, req, 'channel_id', 'room_id' ) );
 }
 
 async function onUpdate( req : Request, res : Response )
