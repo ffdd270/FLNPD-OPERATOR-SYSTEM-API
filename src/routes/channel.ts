@@ -35,12 +35,19 @@ async function onUpdate( req : Request, res : Response )
     res.send( channel );
 }
 
+async function onDelete( req : Request, res : Response )
+{
+    let channel = await get_document( ChannelDocuments, req, 'channel_id', 'room_id' ) as ChannelDocuments;
+    await channel.destroy();
+    res.send("OK");
+}
+
 let FuncMap : FunctionMap  =
 {
     'Create': onCreate,
     'Read': onRead,
     'Update': onUpdate,
-    'Delete': onCreate,
+    'Delete': onDelete,
 }
 
 export let channelRouter = express.Router();
