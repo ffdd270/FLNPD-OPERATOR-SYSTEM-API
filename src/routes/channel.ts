@@ -1,9 +1,8 @@
 import express, {Request, Response} from "express";
-import {find_document, FunctionMap, onRequest} from "../common/util";
+import {find_document, FunctionMap, get_document, onRequest, validate_request_body, update_attr} from "../common/util";
 import {ChannelDocuments} from "../db/documents/channel";
-import {ItemDocuments} from "../db/documents/item";
 
-type ChannelCreateParam =
+type ChannelParam =
     {
         channel_id : string;
         room_id : string;
@@ -16,17 +15,31 @@ async function onCreate( req : Request, res : Response )
         throw  "ALREADY ITEM HERE.";
     }
 
-    let create_params : ChannelCreateParam = { channel_id: req.body.id, room_id: req.body.room_id };
-    let new_channel = await ItemDocuments.create( create_params  );
+    let create_params : ChannelParam = { channel_id: req.body.id, room_id: req.body.room_id };
+    let new_channel = await ChannelDocuments.create( create_params  );
 
     res.send( new_channel );
+}
+
+async function onRead( req : Request, res : Response )
+{
+    res.send( await get_document( ChannelDocuments, req ) );
+}
+
+async function onUpdate( req : Request, res : Response )
+{
+    let channel = await get_document( ChannelDocuments, req, 'channel_id', 'room_id' ) as ChannelDocuments;
+    let param = { channel_id : req.body.channel_id, room_id: req.body.room_id }
+    update_attr(channel, param, [ 'room_id' ] );
+    await channel.save();
+    res.send( channel );
 }
 
 let FuncMap : FunctionMap  =
 {
     'Create': onCreate,
-    'Read': onCreate,
-    'Update': onCreate,
+    'Read': onRead,
+    'Update': onUpdate,
     'Delete': onCreate,
 }
 
@@ -36,7 +49,6 @@ channelRouter.post('/create', async  function ( req, res, next )
 {
     await onRequest( req, res, FuncMap, 'Create' );
 });
-
 
 channelRouter.post('/update', async  function ( req, res, next )
 {

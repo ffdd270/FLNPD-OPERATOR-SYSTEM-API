@@ -15,9 +15,9 @@ interface FindDocumentInterface<Type>
      findOne( param : any ) : Promise<Type>
 }
 
-export async function get_document<DocumentType>( document : FindDocumentInterface<DocumentType>, req : Request ) : Promise<DocumentType>
+export async function get_document<DocumentType>( document : FindDocumentInterface<DocumentType>, req : Request, primary_key1 : string = 'room_id', primary_key2 = 'id' ) : Promise<DocumentType>
 {
-    if ( req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
+    if ( req.body[primary_key1] === undefined || req.body[primary_key2] === undefined ) { throw "Invalid Params."; }
 
     let room_id : string = req.body.room_id;
     let id : string = req.body.id;
@@ -39,9 +39,13 @@ export async function find_document<DocumentType>( document : FindDocumentInterf
 }
 
 
-export function check_id_params( req : Request ) : boolean
+export function validate_request_body( req : Request, req_param : string[] )
 {
-    if ( req.body.room_id === undefined || req.body.id === undefined ) { throw "Invalid Params."; }
+    for ( let param of req_param )
+    {
+        if ( req.body[ param ] === undefined ) { return false; }
+    }
+
     return true;
 }
 
