@@ -1,5 +1,5 @@
 import express, {Request, Response} from "express";
-import {find_document, FunctionMap, get_document, onRequest, validate_request_body, update_attr} from "../common/util";
+import {find_document, FunctionMap, get_document, onRequest, update_attr} from "../common/util";
 import {ChannelDocuments} from "../db/documents/channel";
 
 type ChannelParam =

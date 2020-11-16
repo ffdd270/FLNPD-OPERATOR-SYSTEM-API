@@ -16,10 +16,12 @@ app.use( express.static( path.join(__dirname, 'public' )));
 import { indexRouter } from './routes/index';
 import { characterRouter } from './routes/character';
 import { itemRouter } from './routes/item';
+import { channelRouter } from './routes/channel';
 
 app.use( "/", indexRouter );
 app.use( "/character", characterRouter );
 app.use( "/item", itemRouter );
+app.use( "/channel", channelRouter );
 
 
 // 데베
