@@ -1,7 +1,6 @@
 import express, {Request} from 'express';
 import { ItemDocuments } from "../db/documents/item";
 import {find_document, get_document, update_attr} from "../common/util";
-import {CharacterDocuments} from "../db/documents/character";
 
 export let itemRouter = express.Router();
 
@@ -31,7 +30,7 @@ itemRouter.post('/create', async  function ( req, res, next )
 {
     try
     {
-        if ( await find_document( CharacterDocuments, req ) )
+        if ( await find_document( ItemDocuments, req ) )
         {
             throw  "ALREADY ITEM HERE.";
         }
