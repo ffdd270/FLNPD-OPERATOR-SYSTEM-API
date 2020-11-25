@@ -17,11 +17,13 @@ import { indexRouter } from './routes/index';
 import { characterRouter } from './routes/character';
 import { itemRouter } from './routes/item';
 import { channelRouter } from './routes/channel';
+import { inventoryRouter } from './routes/inventory';
 
 app.use( "/", indexRouter );
 app.use( "/character", characterRouter );
 app.use( "/item", itemRouter );
 app.use( "/channel", channelRouter );
+app.use( "/inventory", inventoryRouter );
 
 
 // 데베

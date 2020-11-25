@@ -12,7 +12,7 @@ export function update_attr<Type, Key extends keyof Type>( dest_data : Type, dat
 
 interface FindDocumentInterface<Type>
 {
-     findOne( param : any ) : Promise<Type>
+    findOne( param : any ) : Promise<Type>
 }
 
 export async function get_document<DocumentType>( document : FindDocumentInterface<DocumentType>, req : Request, primary_key1 : string = 'room_id', primary_key2 = 'id' ) : Promise<DocumentType>
@@ -23,9 +23,9 @@ export async function get_document<DocumentType>( document : FindDocumentInterfa
     let pk_value2 : string = req.body[primary_key2];
 
     let result  = await document.findOne( { where: {
-        [primary_key1]: pk_value1,
-        [primary_key2]: pk_value2
-    } } )
+            [primary_key1]: pk_value1,
+            [primary_key2]: pk_value2
+        } } )
 
     if ( result == null ) { throw "Not Found"; }
     return result;
@@ -79,3 +79,4 @@ export async function onRequest( req : Request, res : Response, func_map : Funct
         res.send(e);
     }
 }
+
