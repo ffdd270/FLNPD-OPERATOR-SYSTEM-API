@@ -68,4 +68,4 @@ async function onDelete( req : Request, res : Response )
 
 let FuncMap : FunctionMap  = Maker.MakeFunctionMap( onCreate, onRead, onUpdate, onDelete );
 export let itemRouter = express.Router();
-Maker.MakeRouter( itemRouter, FuncMap );\
+Maker.MakeRouter( itemRouter, FuncMap );
