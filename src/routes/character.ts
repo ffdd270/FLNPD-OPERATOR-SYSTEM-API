@@ -1,8 +1,8 @@
-import express, {Request} from 'express';
+import express, {Request, Response} from 'express';
 import { CharacterDocuments } from "../db/documents/character";
-import {find_document, get_document, update_attr} from "../common/util";
+import {find_document, FunctionMap, get_document, update_attr} from "../common/util";
+import Maker from "./maker";
 
-export let characterRouter = express.Router();
 
 type CharacterCreateParams =
 {
@@ -33,77 +33,47 @@ function make_character_params_from_req( req : Request ) : CharacterParams
     return params;
 }
 
-
-characterRouter.post( '/create',  async function( req , res, next )
+async function onCreate( req : Request, res : Response )
 {
-    try
+    if ( await find_document( CharacterDocuments, req ) )
     {
-        if ( await find_document( CharacterDocuments, req ) )
-        {
-            throw  "ALREADY CHARACTER HERE.";
-        }
-
-        let create_params : CharacterCreateParams = { id: req.body.id, room_id: req.body.room_id };
-        let params = make_character_params_from_req( req );
-        update_attr( create_params, params, [ 'name', 'comment', 'hp_max', 'hp', 'sp_max', 'sp' ] );
-
-        let new_char = await CharacterDocuments.create( create_params );
-        res.send( new_char );
+        throw  "ALREADY CHARACTER HERE.";
     }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
 
-characterRouter.get( '/get', async function( req : Request, res, next )
+    let create_params : CharacterCreateParams = { id: req.body.id, room_id: req.body.room_id };
+    let params = make_character_params_from_req( req );
+    update_attr( create_params, params, [ 'name', 'comment', 'hp_max', 'hp', 'sp_max', 'sp' ] );
+
+    let new_char = await CharacterDocuments.create( create_params );
+    res.send( new_char );
+}
+
+
+async function onRead( req : Request, res : Response )
 {
-    try
-    {
-        res.send( await get_document(CharacterDocuments, req) );
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.send( await get_document(CharacterDocuments, req) );
+}
 
-characterRouter.post( '/update', async function( req , res, next )
+async function onUpdate( req : Request, res : Response )
 {
-    try
-    {
-        let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
-        let param = make_character_params_from_req( req );
+    let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
+    let param = make_character_params_from_req( req );
 
-        update_attr( character, param, [ 'name', 'comment', 'hp_max', 'hp', 'sp_max', 'sp' ] );
-        await character.save();
+    update_attr( character, param, [ 'name', 'comment', 'hp_max', 'hp', 'sp_max', 'sp' ] );
+    await character.save();
 
-        res.send( character );
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.send( character );
+}
 
-
-characterRouter.post( '/delete', async function( req , res, next )
+async function onDelete( req : Request, res : Response )
 {
-    try
-    {
-        let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
-        await character.destroy();
+    let character =  await get_document( CharacterDocuments, req ) as CharacterDocuments;
+    await character.destroy();
 
-        res.statusCode = 200;
-        res.send("character delete");
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.statusCode = 200;
+    res.send("character delete");
+}
 
+let FuncMap : FunctionMap  = Maker.MakeFunctionMap( onCreate, onRead, onUpdate, onDelete );
+export let characterRouter = express.Router();
+Maker.MakeRouter( characterRouter, FuncMap );
