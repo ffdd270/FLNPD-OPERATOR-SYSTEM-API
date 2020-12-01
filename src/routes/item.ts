@@ -1,8 +1,7 @@
-import express, {Request} from 'express';
+import express, {Request, Response} from 'express';
 import { ItemDocuments } from "../db/documents/item";
-import {find_document, get_document, update_attr} from "../common/util";
-
-export let itemRouter = express.Router();
+import {find_document, FunctionMap, get_document, update_attr} from "../common/util";
+import Maker from "./maker";
 
 type ItemCreateParams =
     {
@@ -26,76 +25,47 @@ function make_item_params_from_req( req : Request ) : ItemUpdateParams
     return params;
 }
 
-itemRouter.post('/create', async  function ( req, res, next )
+async function onCreate( req : Request, res : Response )
 {
-    try
+    if ( await find_document( ItemDocuments, req ) )
     {
-        if ( await find_document( ItemDocuments, req ) )
-        {
-            throw  "ALREADY ITEM HERE.";
-        }
-
-        let create_params : ItemCreateParams = { id: req.body.id, room_id: req.body.room_id };
-        let params = make_item_params_from_req( req );
-
-        update_attr( create_params, params, [ 'name', 'desc' ] );
-
-        let new_item = await ItemDocuments.create( create_params );
-        res.send( new_item );
+        throw  "ALREADY ITEM HERE.";
     }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
 
-itemRouter.post( '/update', async function( req, res, next )
+    let create_params : ItemCreateParams = { id: req.body.id, room_id: req.body.room_id };
+    let params = make_item_params_from_req( req );
+
+    update_attr( create_params, params, [ 'name', 'desc' ] );
+
+    let new_item = await ItemDocuments.create( create_params );
+    res.send( new_item );
+}
+
+async function onUpdate( req : Request, res : Response )
 {
-    try
-    {
-        let item = await get_document( ItemDocuments, req ) as ItemDocuments;
-        let param = make_item_params_from_req( req );
+    let item = await get_document( ItemDocuments, req ) as ItemDocuments;
+    let param = make_item_params_from_req( req );
 
-        update_attr( item, param, [ 'name', 'desc' ] );
-        await item.save();
+    update_attr( item, param, [ 'name', 'desc' ] );
+    await item.save();
 
-        res.send( item );
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.send( item );
+}
 
-
-itemRouter.get( '/get', async function( req, res, next )
+async function onRead( req : Request, res : Response )
 {
-    try
-    {
-        res.send( await get_document( ItemDocuments, req ) );
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.send( await get_document( ItemDocuments, req ) );
+}
 
-itemRouter.post( '/delete',  async function( req, res, next )
+async function onDelete( req : Request, res : Response )
 {
-    try
-    {
-        let item =  await get_document( ItemDocuments, req ) as ItemDocuments;
-        await item.destroy();
+    let item =  await get_document( ItemDocuments, req ) as ItemDocuments;
+    await item.destroy();
 
-        res.statusCode = 200;
-        res.send("item delete");
-    }
-    catch (e)
-    {
-        res.statusCode = 422;
-        res.send(e);
-    }
-});
+    res.statusCode = 200;
+    res.send("item delete");
+}
+
+let FuncMap : FunctionMap  = Maker.MakeFunctionMap( onCreate, onRead, onUpdate, onDelete );
+export let itemRouter = express.Router();
+Maker.MakeRouter( itemRouter, FuncMap );\
