@@ -1,6 +1,7 @@
 import express, {Request, Response} from "express";
-import {find_document, FunctionMap, get_document, onRequest, update_attr} from "../common/util";
+import {find_document, FunctionMap, get_document, update_attr} from "../common/util";
 import {ChannelDocuments} from "../db/documents/channel";
+import Maker from "./maker";
 
 type ChannelParam =
     {
@@ -42,32 +43,7 @@ async function onDelete( req : Request, res : Response )
     res.send("OK");
 }
 
-let FuncMap : FunctionMap  =
-{
-    'Create': onCreate,
-    'Read': onRead,
-    'Update': onUpdate,
-    'Delete': onDelete,
-}
 
+let FuncMap : FunctionMap  = Maker.MakeFunctionMap( onCreate, onRead, onUpdate, onDelete );
 export let channelRouter = express.Router();
-
-channelRouter.post('/create', async  function ( req, res, next )
-{
-    await onRequest( req, res, FuncMap, 'Create' );
-});
-
-channelRouter.post('/update', async  function ( req, res, next )
-{
-    await onRequest( req, res, FuncMap, 'Update' );
-});
-
-channelRouter.get('/get', async  function ( req, res, next )
-{
-    await onRequest( req, res, FuncMap, 'Read' );
-});
-
-channelRouter.post('/delete', async  function ( req, res, next )
-{
-    await onRequest( req, res, FuncMap, 'Delete' );
-});
+Maker.MakeRouter( channelRouter, FuncMap );
